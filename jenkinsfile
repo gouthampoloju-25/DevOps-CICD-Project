@@ -3,34 +3,41 @@ pipeline {
 
     stages {
 
-        stage('Checkout') {
+        stage('Build') {
             steps {
-                echo 'Checking out source code...'
+                echo 'Building DevOps website...'
+                sh 'ls -la'
             }
         }
 
-        stage('Build and Test') {
+        stage('Test') {
             steps {
-                echo 'Build and Test successful!'
+                echo 'Testing website files...'
+                sh 'test -f index.html'
+                sh 'test -f style.css'
+                sh 'test -s index.html'
+                sh 'test -s style.css'
+                echo 'Website tests passed.'
             }
         }
 
-        stage('Generate Artifact') {
+        stage('Deploy') {
             steps {
-                bat '''
-                    if not exist artifacts mkdir artifacts
-                    copy dev.html artifacts\\
-                '''
+                echo 'Deploying website to Nginx...'
+                sh 'cp index.html /deploy/index.html'
+                sh 'cp style.css /deploy/style.css'
+                echo 'Website deployed successfully!'
             }
         }
     }
 
     post {
         success {
-            archiveArtifacts artifacts: 'artifacts/*.html',
-                onlyIfSuccessful: true
+            echo 'CI/CD Pipeline completed successfully!'
+        }
 
-            echo 'Pipeline completed successfully!'
+        failure {
+            echo 'CI/CD Pipeline failed.'
         }
     }
 }
