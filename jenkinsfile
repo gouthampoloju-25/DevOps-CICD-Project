@@ -1,0 +1,36 @@
+pipeline {
+    agent any
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                echo 'Checking out source code...'
+            }
+        }
+
+        stage('Build and Test') {
+            steps {
+                echo 'Build and Test successful!'
+            }
+        }
+
+        stage('Generate Artifact') {
+            steps {
+                bat '''
+                    if not exist artifacts mkdir artifacts
+                    copy dev.html artifacts\\
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            archiveArtifacts artifacts: 'artifacts/*.html',
+                onlyIfSuccessful: true
+
+            echo 'Pipeline completed successfully!'
+        }
+    }
+}
